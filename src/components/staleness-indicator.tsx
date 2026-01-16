@@ -1,4 +1,5 @@
-import { flagOutOfDateData, type FlagOutOfDateDataInput } from "@/ai/flows/flag-out-of-date-data";
+"use client";
+
 import { AlertTriangle } from "lucide-react";
 import {
   Tooltip,
@@ -6,24 +7,48 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { differenceInHours, differenceInDays, parseISO } from "date-fns";
 
-export default async function StalenessIndicator(props: FlagOutOfDateDataInput) {
-    const stalenessInfo = await flagOutOfDateData(props);
+type StalenessIndicatorProps = {
+  lastUpdated: string;
+  typicalUpdateInterval: string;
+};
 
-    if (!stalenessInfo.isOutOfDate) {
-        return null;
+export default function StalenessIndicator({
+  lastUpdated,
+  typicalUpdateInterval,
+}: StalenessIndicatorProps) {
+  const lastUpdatedDate = parseISO(lastUpdated);
+  const now = new Date();
+  let isOutOfDate = false;
+  let reason = "";
+
+  if (typicalUpdateInterval === "daily") {
+    if (differenceInHours(now, lastUpdatedDate) > 24) {
+      isOutOfDate = true;
+      reason = "Data may be out of date. It is usually updated daily.";
     }
+  } else if (typicalUpdateInterval === "weekly") {
+    if (differenceInDays(now, lastUpdatedDate) > 7) {
+      isOutOfDate = true;
+      reason = "Data may be out of date. It is usually updated weekly.";
+    }
+  }
 
-    return (
-        <TooltipProvider>
-            <Tooltip delayDuration={100}>
-                <TooltipTrigger>
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p className="max-w-xs">{stalenessInfo.reason}</p>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
-    );
+  if (!isOutOfDate) {
+    return null;
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={100}>
+        <TooltipTrigger>
+          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="max-w-xs">{reason}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }

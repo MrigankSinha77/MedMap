@@ -53,11 +53,8 @@ export default function PharmacyCard({ pharmacy }: PharmacyCardProps) {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                     <span>Updated {formatDistanceToNow(new Date(item.lastUpdated), { addSuffix: true })}</span>
                     <StalenessIndicator
-                        medicineName={medicineDetails.name}
-                        pharmacyName={pharmacy.name}
                         lastUpdated={item.lastUpdated}
                         typicalUpdateInterval={pharmacy.typicalUpdateInterval}
-                        availability={item.stock}
                     />
                 </div>
               </div>
