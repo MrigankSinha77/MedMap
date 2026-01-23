@@ -10,6 +10,13 @@
 - Data Reliability Tool: AI tool to flag data if not updated in a timely fashion or according to the update patterns of reliable pharmacies.
 - Verified Pharmacy Access: System to ensure only verified pharmacies can list medicines to prevent false information.
 
+## Medicine Authenticity Features:
+
+- QR / batch number scan
+- Manufacturer verification
+- Expiry alerts
+- Fights counterfeit medicines
+
 ## Style Guidelines:
 
 - Choose a dark color scheme. Primary color: Saturated blue (#4285F4), a common 'medical' color.
