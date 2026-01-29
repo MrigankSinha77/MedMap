@@ -13,10 +13,13 @@ type PharmacyCardProps = {
 
 export default function PharmacyCard({ pharmacy }: PharmacyCardProps) {
   return (
-    <Card className="flex h-full flex-col transition-all hover:shadow-lg bg-card/60 dark:bg-card/40 backdrop-blur-xl border">
+    <Card className={`flex h-full flex-col transition-all hover:shadow-lg bg-card/60 dark:bg-card/40 backdrop-blur-xl border ${!pharmacy.open ? 'grayscale' : ''}`}>
       <CardHeader>
         <CardTitle className="flex items-start justify-between">
-          <span>{pharmacy.name}</span>
+          <span className="flex items-center gap-2">
+            <span className={`w-3 h-3 rounded-full ${pharmacy.open ? 'bg-green-500' : 'bg-red-500'}`}></span>
+            {pharmacy.name}
+          </span>
           {pharmacy.isVerified && (
             <Badge variant="secondary" className="flex items-center gap-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">
               <CheckCircle className="h-3 w-3" />

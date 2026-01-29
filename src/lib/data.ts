@@ -16,6 +16,7 @@ export const pharmacies: Pharmacy[] = [
     address: "123 Main St, Cityville",
     location: { lat: 34.0522, lng: -118.2437 },
     isVerified: true,
+    open: true,
     typicalUpdateInterval: "daily",
     medicines: [
       { medicineId: "1", stock: "available", lastUpdated: subHours(new Date(), 2).toISOString() },
@@ -29,6 +30,7 @@ export const pharmacies: Pharmacy[] = [
     address: "456 Oak Ave, Cityville",
     location: { lat: 34.0622, lng: -118.2537 },
     isVerified: true,
+    open: false,
     typicalUpdateInterval: "daily",
     medicines: [
       { medicineId: "1", stock: "out-of-stock", lastUpdated: subHours(new Date(), 8).toISOString() },
@@ -43,6 +45,7 @@ export const pharmacies: Pharmacy[] = [
     address: "789 Pine Ln, Suburbia",
     location: { lat: 34.1522, lng: -118.4437 },
     isVerified: false,
+    open: true,
     typicalUpdateInterval: "weekly",
     medicines: [
       { medicineId: "4", stock: "available", lastUpdated: subDays(new Date(), 2).toISOString() },
@@ -55,6 +58,7 @@ export const pharmacies: Pharmacy[] = [
     address: "101 Metro Blvd, Metropolis",
     location: { lat: 34.055, lng: -118.24 },
     isVerified: true,
+    open: false,
     typicalUpdateInterval: "daily",
     medicines: [
       { medicineId: "1", stock: "limited", lastUpdated: subHours(new Date(), 3).toISOString() },

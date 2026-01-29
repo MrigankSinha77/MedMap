@@ -22,6 +22,7 @@ export type Pharmacy = {
     lng: number;
   };
   isVerified: boolean;
+  open: boolean;
   medicines: PharmacyMedicine[];
   typicalUpdateInterval: string;
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Search, MapPin, Loader2, ServerCrash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,46 +10,46 @@ import { haversineDistance } from "@/lib/utils";
 import { medicines, pharmacies } from "@/lib/data";
 import type { Pharmacy } from "@/lib/types";
 
+const alternativeMedicines: Record<string, string> = {
+  paracetamol: "ibuprofen",
+  ibuprofen: "paracetamol",
+  cetirizine: "loratadine",
+  loratadine: "cetirizine",
+};
+
 type UserLocation = {
   lat: number;
   lng: number;
 };
 
-export default function SearchSection() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
-  const [isLocating, setIsLocating] = useState(true);
+interface SearchSectionProps {
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
+  userLocation: UserLocation | null;
+  isLocating: boolean;
+  locationError: string | null;
+  handleGetLocation: () => void;
+  onPharmaciesChange: (pharmacies: (Pharmacy & { distance: number })[]) => void;
+}
 
-  const handleGetLocation = () => {
-    setIsLocating(true);
-    setLocationError(null);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        setIsLocating(false);
-      },
-      (error) => {
-        setLocationError(error.message);
-        setIsLocating(false);
-      }
-    );
-  };
-
-  useEffect(() => {
-    handleGetLocation();
-  }, []);
+export default function SearchSection({ 
+  searchTerm, 
+  onSearchTermChange,
+  userLocation,
+  isLocating,
+  locationError,
+  handleGetLocation,
+  onPharmaciesChange
+}: SearchSectionProps) {
 
   const filteredPharmacies = useMemo(() => {
     if (!pharmacies) return [];
     
     let results = pharmacies;
+    const trimmedSearchTerm = searchTerm.trim();
 
-    if (searchTerm) {
-        const lowercasedTerm = searchTerm.toLowerCase();
+    if (trimmedSearchTerm) {
+        const lowercasedTerm = trimmedSearchTerm.toLowerCase();
         const matchingMedicineIds = medicines
             .filter(med => 
                 med.name.toLowerCase().includes(lowercasedTerm) ||
@@ -78,6 +78,18 @@ export default function SearchSection() {
     return results.map(p => ({ ...p, distance: -1 }));
   }, [searchTerm, userLocation]);
 
+  useEffect(() => {
+    onPharmaciesChange(filteredPharmacies);
+  }, [filteredPharmacies, onPharmaciesChange]);
+
+  const alternative = useMemo(() => {
+    const trimmedSearchTerm = searchTerm.trim().toLowerCase();
+    if (filteredPharmacies.length === 0 && trimmedSearchTerm in alternativeMedicines) {
+      return alternativeMedicines[trimmedSearchTerm];
+    }
+    return null;
+  }, [searchTerm, filteredPharmacies]);
+
   return (
     <div className="mt-10">
       <div className="mx-auto mb-8 max-w-2xl">
@@ -88,7 +100,8 @@ export default function SearchSection() {
             placeholder="Search by medicine name, composition, or brand..."
             className="w-full rounded-full pl-10 pr-4 py-6 text-base"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchTermChange(e.target.value)}
+            disabled={isLocating}
           />
         </div>
         <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -125,13 +138,19 @@ export default function SearchSection() {
             </div>
         )}
 
-        {!isLocating && filteredPharmacies.length === 0 && (
+        {!isLocating && searchTerm.trim() && filteredPharmacies.length === 0 && (
              <div className="col-span-full flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
                 <Search className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-semibold">No Results Found</h3>
-                <p className="mb-4 mt-2 text-sm text-muted-foreground">
-                    Try a different search term or check back later.
-                </p>
+                {alternative ? (
+                  <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                    No results for "{searchTerm.trim()}". Try searching for "{alternative}" instead.
+                  </p>
+                ) : (
+                  <p className="mb-4 mt-2 text-sm text-muted-foreground">
+                      Try a different search term or check back later.
+                  </p>
+                )}
             </div>
         )}
         
